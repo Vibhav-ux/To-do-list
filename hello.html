@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shree Krishna To-Do List</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- General Body Styling --- */
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow: hidden;
+            position: relative; 
+            background-color: #001f3f; /* Fallback color */
+        }
+        
+        /* --- Background Image Styling (Dynamic src="krishna.jpg") --- */
+        #background-image {
+            position: fixed; 
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; 
+            z-index: -3; /* Farthest back */
+            
+            /* Animation for "Live Wallpaper" effect */
+            animation: background-pan-zoom 30s infinite alternate ease-in-out;
+        }
+
+        /* Keyframes for background image subtle movement */
+        @keyframes background-pan-zoom {
+            0% { transform: scale(1.1); }
+            100% { transform: scale(1.0); }
+        }
+        
+        /* Ethereal Dark Overlay for Readability */
+        body::before {
+            content: '';
+            position: fixed; 
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.3); /* Darkens the image slightly */
+            z-index: -2; 
+        }
+
+        /* Floating Particles (Sparkles) */
+        .particle-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; 
+            z-index: -1; 
+        }
+        .particle {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            opacity: 0;
+            animation: float 15s infinite ease-out;
+        }
+
+        /* Keyframes for floating particles */
+        @keyframes float {
+            0% { transform: translateY(0) scale(0.5); opacity: 0; }
+            20% { opacity: 0.5; }
+            80% { opacity: 0.3; }
+            100% { transform: translateY(-100vh) scale(1.2); opacity: 0; }
+        }
+
+        /* --- Main Container (95% TRANSPARENT FORM) --- */
+        .container {
+            /* White with 5% opacity (95% transparent) */
+            background-color: rgba(255, 255, 255, 0.05); 
+            
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px; 
+            margin-top: 50px;
+            position: relative; 
+            z-index: 1; 
+            
+            /* Charismatic border glow */
+            border: 3px solid transparent;
+            border-image: linear-gradient(45deg, #ff7e5f, #feb47b, #ffecb3, #a6c1ee);
+            border-image-slice: 1;
+        }
+
+        /* --- Header / Input Area / List Items (Adjusted for Readability over transparent form) --- */
+        h1 {
+            text-align: center;
+            color: #fff; /* Changed text color to white for better contrast */
+            text-shadow: 1px 1px 2px #000;
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+
+        .input-area {
+            display: flex;
+            flex-direction: column; 
+            margin-bottom: 20px;
+        }
+
+        #todo-input, #todo-time {
+            padding: 12px;
+            border: 2px solid #a6c1ee;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 10px;
+            width: 100%;
+            box-sizing: border-box;
+            background-color: rgba(255, 255, 255, 0.85); /* Make inputs mostly opaque for typing */
+            color: #333;
+        }
+
+        #add-btn {
+            background: linear-gradient(45deg, #ff7e5f, #feb47b); 
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 10px;
+            font-weight: 600;
+            width: 100%;
+        }
+        
+        #todo-list { list-style: none; padding: 0; }
+        #todo-list li {
+            background-color: rgba(255, 255, 255, 0.85); /* Make list items mostly opaque for reading */
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #a6c1ee; 
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .task-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+        .task-text { flex-grow: 1; cursor: pointer; font-weight: 600; font-size: 1.1em; padding-right: 10px; }
+        .task-time { font-size: 0.85em; color: #777; margin-top: 5px; }
+        
+        /* Completed/Reminder Styles */
+        #todo-list li.completed { background-color: rgba(224, 247, 250, 0.85); border-left: 5px solid #00c853; } 
+        #todo-list li.completed .task-text { text-decoration: line-through; color: #777; }
+        #todo-list li.due-soon { border-left: 5px solid #ff7e5f; animation: pulse 1.5s infinite alternate; }
+        @keyframes pulse { from { box-shadow: 0 0 10px rgba(255, 126, 95, 0.5); } to { box-shadow: 0 0 15px rgba(255, 126, 95, 0.8); } }
+        .delete-btn { background-color: #ff6b6b; color: white; border: none; padding: 6px 10px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; }
+    </style>
+</head>
+<body>
+    
+<img id="background-image" src="krishna.jpg" alt="Shree Krishna Background">
+
+<div class="particle-container" id="particle-container"></div>
+
+    <div class="container">
+        <h1>⏰ Divine To-Do List ⏰</h1>
+        <div class="input-area">
+            <input type="text" id="todo-input" placeholder="Add a new task...">
+            <input type="datetime-local" id="todo-time">
+            <button id="add-btn">Add Task</button>
+        </div>
+        <ul id="todo-list">
+            </ul>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const todoInput = document.getElementById('todo-input');
+            const todoTimeInput = document.getElementById('todo-time');
+            const addBtn = document.getElementById('add-btn');
+            const todoList = document.getElementById('todo-list');
+            const particleContainer = document.getElementById('particle-container');
+            let reminderInterval;
+
+            loadTasks();
+            startReminderCheck();
+            createParticles(); 
+
+            addBtn.addEventListener('click', addTask);
+            todoInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    addTask();
+                }
+            });
+            todoList.addEventListener('click', handleTaskActions);
+
+            // --- Core Functions ---
+
+            function addTask() {
+                const taskText = todoInput.value.trim();
+                const dueTime = todoTimeInput.value;
+
+                if (taskText !== "") {
+                    createTaskElement(taskText, dueTime, false); 
+                    saveTasks();
+                    todoInput.value = '';
+                    todoTimeInput.value = ''; 
+                }
+            }
+
+            function createTaskElement(text, dueTime, isCompleted) {
+                const listItem = document.createElement('li');
+                listItem.className = isCompleted ? 'completed' : '';
+                listItem.dataset.due = dueTime; 
+
+                const taskHeader = document.createElement('div');
+                taskHeader.className = 'task-header';
+
+                const taskSpan = document.createElement('span');
+                taskSpan.textContent = text;
+                taskSpan.className = 'task-text';
+                
+                taskSpan.addEventListener('click', () => {
+                    listItem.classList.toggle('completed');
+                    if (listItem.classList.contains('completed')) {
+                        listItem.classList.remove('due-soon');
+                    }
+                    saveTasks();
+                });
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.dataset.action = 'delete';
+
+                taskHeader.appendChild(taskSpan);
+                taskHeader.appendChild(deleteBtn);
+                listItem.appendChild(taskHeader);
+
+                if (dueTime) {
+                    const timeDisplay = document.createElement('p');
+                    timeDisplay.className = 'task-time';
+                    timeDisplay.textContent = 'Due: ' + formatDateTime(dueTime);
+                    listItem.appendChild(timeDisplay);
+                }
+
+                todoList.appendChild(listItem);
+                checkTaskReminder(listItem); 
+            }
+
+            function handleTaskActions(e) {
+                const target = e.target;
+                
+                if (target.dataset.action === 'delete') {
+                    const listItem = target.closest('li');
+                    if (listItem) {
+                        listItem.style.opacity = '0';
+                        setTimeout(() => {
+                            listItem.remove();
+                            saveTasks(); 
+                        }, 300); 
+                    }
+                }
+            }
+            
+            // --- Time and Reminder Functions ---
+
+            function formatDateTime(isoString) {
+                if (!isoString) return '';
+                const date = new Date(isoString);
+                
+                if (isNaN(date)) return 'Invalid Date';
+
+                const options = { 
+                    month: 'short', day: 'numeric', 
+                    hour: '2-digit', minute: '2-digit' 
+                };
+                return date.toLocaleDateString(undefined, options);
+            }
+
+            function checkTaskReminder(listItem) {
+                const dueTime = listItem.dataset.due;
+                const isCompleted = listItem.classList.contains('completed');
+                
+                if (!dueTime || isCompleted) {
+                    listItem.classList.remove('due-soon');
+                    return;
+                }
+
+                const dueStamp = new Date(dueTime).getTime();
+                const nowStamp = Date.now();
+                const timeDiff = dueStamp - nowStamp;
+                
+                const timeThreshold = 1000 * 60 * 60 * 24; 
+
+                if (timeDiff <= 0) {
+                    if (!listItem.dataset.alerted) {
+                         alert(🚨 REMINDER: The task "${listItem.querySelector('.task-text').textContent}" is now DUE!);
+                         listItem.dataset.alerted = 'true'; 
+                    }
+                    listItem.classList.add('due-soon');
+                } else if (timeDiff < timeThreshold) {
+                    listItem.classList.add('due-soon');
+                } else {
+                    listItem.classList.remove('due-soon');
+                }
+            }
+            
+            function startReminderCheck() {
+                reminderInterval = setInterval(() => {
+                    todoList.querySelectorAll('li').forEach(checkTaskReminder);
+                }, 60000); 
+            }
+
+            // --- Particle Generation ---
+            function createParticles() {
+                const numParticles = 20; 
+                for (let i = 0; i < numParticles; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    
+                    const size = Math.random() * 5 + 2; 
+                    particle.style.width = ${size}px;
+                    particle.style.height = ${size}px;
+                    
+                    particle.style.left = ${Math.random() * 100}%; 
+                    
+                    const delay = Math.random() * 10; 
+                    particle.style.animationDelay = ${delay}s;
+                    
+                    const duration = Math.random() * 10 + 10; 
+                    particle.style.animationDuration = ${duration}s;
+
+                    particleContainer.appendChild(particle);
+                }
+            }
+            
+            // --- Storage Functions (for persistence) ---
+
+            function saveTasks() {
+                const tasks = [];
+                todoList.querySelectorAll('li').forEach(item => {
+                    tasks.push({
+                        text: item.querySelector('.task-text').textContent,
+                        due: item.dataset.due,
+                        completed: item.classList.contains('completed')
+                    });
+                });
+                localStorage.setItem('sparkle-todo-tasks-timing', JSON.stringify(tasks));
+            }
+
+            function loadTasks() {
+                const savedTasks = localStorage.getItem('sparkle-todo-tasks-timing');
+                if (savedTasks) {
+                    const tasks = JSON.parse(savedTasks);
+                    tasks.forEach(task => {
+                        createTaskElement(task.text, task.due, task.completed);
+                    });
+                }
+            }
+        });
+    </script>
+</body>
+</html>
